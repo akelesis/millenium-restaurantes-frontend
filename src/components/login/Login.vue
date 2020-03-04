@@ -14,7 +14,7 @@
           placeholder="Insira sua senha"
         />
       </div>
-      <router-link to="/dashboard"><button type="button" class="btn-login">Entrar</button></router-link>
+      <button type="button" class="btn-login" @click="redirect">Entrar</button>
     </div>
   </div>
 </template>
@@ -26,6 +26,16 @@ export default {
       email: "",
       password: ""
     };
+  },
+  methods: {
+    redirect(){
+      if(localStorage.getItem("_settings")){
+        this.$router.push('/restaurant')
+      }
+      else{
+        this.$router.push('/settings')
+      }
+    }
   }
 };
 </script>

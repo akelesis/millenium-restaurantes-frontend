@@ -106,8 +106,8 @@ export default {
       creditMethod: 0,
       paymentOpt: [
         {value: null, text: "Escolha uma forma de pagamento"},
-        {value: "à vista", text: "À vista ou no débito"},
-        {value: "crédito", text: "Cartão de crédito"}
+        {value: 0, text: "À vista ou no débito"},
+        {value: 1, text: "Cartão de crédito"}
       ],
       creditOpt: [
         {value: 0, text: "Escolha o numero de parcelas em caso de crédito"},
@@ -121,7 +121,8 @@ export default {
       bill: 0.00,
       couvert: 0.00,
       total: 0.00,
-      tip: 0.00
+      tip: 0.00,
+      settings: {}
     };
   },
   methods: {
@@ -183,6 +184,10 @@ export default {
         closedTable.date = closedTable.date + "-02:00"
         let tableProds = []
 
+        let ValorFinal = 0
+
+        this.settings = JSON.parse(localStorage.getItem("_settings"))
+
         for(let i = 0; i < this.$store.state.table.products.length; i++){
           let aux = {}
           aux.Codigo = this.$store.state.table.products[i].codeFromAPI
@@ -192,11 +197,9 @@ export default {
           aux.ValorUnitario = this.$store.state.table.products[i].price
           aux.DescontoUnitario = ""
           aux.ValorTotal = this.$store.state.table.products[i].price * this.$store.state.table.products[i].quantity
+          ValorFinal += aux.ValorTotal;
           tableProds.push(aux)
-          console.log(aux)
         }
-
-        
         
         const headers = {
           AuthorizationToken: "840feb502f48dc43eee47369ed251508960b49a3a3447222e711a103b08518b0a9a498e7069fc4f3763b990fa6d1480fdcf29f47ead5a9e67ad08327007eac3f72baabccc1b7d0ca086cc222a544c838195b400539aa2adf87c4a4557e434cb909b467ab0424a9f0b1dc9059cf774af3f168e9128b0427183271eb1cd8d40ca7",
@@ -205,20 +208,20 @@ export default {
         }
         const emission = {
           "OrigemVenda":"Venda Direta",
-          "Deposito":"DEMONSTRAÇÃO TESTE",
-          "StatusSistema":"Orçamento",
+          "Deposito":this.settings.stock,
+          "StatusSistema":"Pedido Faturado",
           "Status":"",
           "Categoria":"",
           "Validade":"",
-          "Empresa":"MILLENIUM CONTABIL",
+          "Empresa":this.settings.company,
           "Cliente":"EMPORIO DA CARNE COMERCIO VAREJISTA EIRELI",
           "Vendedor":"login@vendedor.com",
           "LancarComissaoVendedor":true,
           "PlanoDeConta":"ALIMENTACAO",
-          "FormaPagamento":"",
-          "NumeroParcelas":0,
+          "FormaPagamento":this.paymentMethod,
+          "NumeroParcelas":this.creditMethod,
           "Transportadora":"",
-          "DataEnvio":"0001-01-01T00:00:00-02:00",
+          "DataEnvio":closedTable.date,
           "Enviado":false,
           "ValorFrete":0.0,
           "FreteContaEmitente":false,
@@ -226,38 +229,37 @@ export default {
           "Descricao":"",
           "OutrasDespesas":0.0,
           "ValorFinal": 0,
-          "Finalizado":false,
-          "Lancado":false,
-          "NumeroNFe":"1234",
-          "Municipio":"Itabuna",
-          "CodigoMunicipio":"4302352",
+          "Finalizado":true,
+          "Lancado":true,
+          "NumeroNFe":"",
+          "Municipio":this.settings.city,
+          "CodigoMunicipio":this.settings.code,
           "Pais":"Brasil",
-          "CEP":"95765000",
-          "UF":"RS",
-          "UFCodigo":"43",
-          "Bairro":"",
-          "Logradouro":"Rua São José",
-          "LogradouroNumero":"204",
-          "LogradouroComplemento":"Casa",
+          "CEP":this.settings.zipCode,
+          "UF":"Bahia",
+          "UFCodigo":"29",
+          "Bairro":this.settings.neighborhood,
+          "Logradouro":this.settings.street,
+          "LogradouroNumero":this.settings.number,
+          "LogradouroComplemento":"",
           "Items": tableProds,
           "Pagamentos": [
             {
             "DescricaoPagamento":"Pagamento",
-            "ValorPagamento":10.0,
+            "ValorPagamento":ValorFinal,
             "BandeiraCartao":"99",
             "NumeroTerminal":"1",
-            "DataTransacao":"2019-08-12T19:14:38-02:00",
+            "DataTransacao":closedTable.date,
             "CredenciadoraCartao":"",
             "CredenciadoraCNPJ":"",
             "CV_NSU":"",
-            "CondicaoPagamento":1,
-            "Parcelas":0,
+            "CondicaoPagamento":this.paymentMethod,
+            "Parcelas":this.creditMethod,
             "PeriodoParcelas":0,
             "Adiantamento":0.0,
             "Quitar":"true"
             }]
           }
-          console.log({...emission})
 
           const pack = {headers, emission}
 

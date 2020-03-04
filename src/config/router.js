@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '../views/Home.vue'
-import Dashboard from '../components/dashboard/Dashboard.vue'
+import Settings from '../components/settings_page/Settings.vue'
 import Restaurant from '../components/restaurant/Restaurant.vue'
 import Table from '../components/restaurant/Table.vue'
 import Reports from '../components/restaurant/Reports.vue'
@@ -18,9 +18,9 @@ export default new Router({
       component: Home
     },
     {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: Dashboard
+      path: '/settings',
+      name: 'settings',
+      component: Settings
     },
     {
       path: '/restaurant',
