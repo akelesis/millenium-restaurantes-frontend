@@ -14,9 +14,9 @@
         <i class="fas fa-store"></i>
         <p>Add ao estoque</p>
       </div> -->
-      <div class="toolcard" @click="$router.push({path: '/dashboard'})">
-        <i class="fas fa-home"></i>
-        <p>Início</p>
+      <div class="toolcard" @click="$router.push({path: '/settings'})">
+        <i class="fas fa-users-cog"></i>
+        <p>Configurações</p>
       </div>
       <div class="toolcard" @click="$router.push({path: '/'})">
         <i class="fas fa-door-open"></i>
@@ -39,28 +39,6 @@
       </div>
       <b-button class="mt-3" variant="primary" block @click="openTable()">Abrir Mesa</b-button>
     </b-modal>
-
-    <!-- ADD TO STOCK -->
-    <!-- <b-modal id="add-stock-modal" size="lg" title="Adicionar ao estoque" hide-footer>
-      <b-input-group size="md" prepend="Nome do produto">
-        <b-form-input type="text" v-model="product.name"></b-form-input>
-      </b-input-group>
-      <b-form-textarea
-        id="textarea"
-        v-model="product.text"
-        class="mt-3"
-        placeholder="Descrição do produto"
-        rows="3"
-        max-rows="6"
-      ></b-form-textarea>
-      <b-input-group size="md" prepend="Preço">
-        <b-form-input type="text" v-model="product.preco"></b-form-input>
-      </b-input-group>
-      <b-input-group size="md" prepend="quantidade em estoque">
-        <b-form-input type="number" min="0" max="999" v-model="product.quantity"></b-form-input>
-      </b-input-group>
-      <b-button class="mt-3" variant="primary" block @click="addStock()">Inserir produto</b-button>
-    </b-modal> -->
 
     <!-- MAIN SCREEN -->
     <div class="tablemap-container">

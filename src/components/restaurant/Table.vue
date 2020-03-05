@@ -99,7 +99,6 @@ export default {
   data() {
     return {
       OnTableChange: false,
-      stripped: ["light", "dark"],
       product: {},
       quantity: "",
       paymentMethod: null,
@@ -128,14 +127,58 @@ export default {
   methods: {
 
     loadProducts(){
-      const headers = {}
-      headers.AuthorizationToken = "840feb502f48dc43eee47369ed251508960b49a3a3447222e711a103b08518b0a9a498e7069fc4f3763b990fa6d1480fdcf29f47ead5a9e67ad08327007eac3f72baabccc1b7d0ca086cc222a544c838195b400539aa2adf87c4a4557e434cb909b467ab0424a9f0b1dc9059cf774af3f168e9128b0427183271eb1cd8d40ca7"
-      headers.User = "robson@milleniumcontabil.com"
-      headers.App = "millenium"
-      axios.post('http://localhost:8080/api/products', headers)
-        .then(res => {
-          this.$store.state.products = res.data;
-        })
+      if(navigator.onLine){
+        const headers = {}
+        headers.AuthorizationToken = "840feb502f48dc43eee47369ed251508960b49a3a3447222e711a103b08518b0a9a498e7069fc4f3763b990fa6d1480fdcf29f47ead5a9e67ad08327007eac3f72baabccc1b7d0ca086cc222a544c838195b400539aa2adf87c4a4557e434cb909b467ab0424a9f0b1dc9059cf774af3f168e9128b0427183271eb1cd8d40ca7"
+        headers.User = "robson@milleniumcontabil.com"
+        headers.App = "millenium"
+
+        let db
+
+        axios.post('http://localhost:8080/api/products', headers)
+          .then(res => {
+            this.$store.state.products = res.data;
+            if(window.indexedDB){
+              const request = window.indexedDB.open("products")
+              request.onerror = event => {
+                alert("Error on creating Database: " + event.target.errorCode)
+              }
+              request.onupgradeneeded = event => {
+                alert("Database successful created! " + event)
+                db = event.target.result
+
+                const objectStore = db.createObjectStore("stockProducts", {keyPath: "id"})
+
+                objectStore.createIndex("name", "name", {unique: false})
+
+                objectStore.transaction.oncomplete = () => {
+                  const productObjStore = db.transaction("stockProducts", "readwrite").objectStore("stockProducts")
+
+                  res.data.forEach(product => {
+                    productObjStore.add(product)
+                  });
+                }
+              }
+
+            }
+          })
+      }
+      else{
+        const request = window.indexedDB.open("products")
+        request.onerror = event => {
+            alert("Error on creating Database: " + event.target.errorCode)
+        }
+        request.onsuccess = event => {
+            const db = event.target.result
+
+            const objectStore = db.transaction("stockProducts").objectStore("stockProducts")
+ 
+            objectStore.getAll().onsuccess = event => {
+            this.$store.state.products = event.target.result
+          }
+        }
+      }
+     
     },
 
     insertOrder() {
@@ -265,7 +308,7 @@ export default {
 
         axios.post('http://localhost:8080/api/bills', pack)
         .then(res => {
-          console.log(res.data)
+          return res.data
         })
         
         /*closedTable.id = this.table.id
