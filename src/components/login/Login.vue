@@ -4,15 +4,23 @@
       <img class="img-login" src="@/assets/logo-millenium-erp.png" alt="logo millenium ERP" />
       <h3 class="login-title">Por favor, insira as suas credenciais:</h3>
       <div class="input-group">
-        <input type="text" class="login-input" v-model="email" placeholder="Insira seu email" />
+        <input
+          type="text"
+          class="login-input"
+          v-model="credentials.email"
+          placeholder="Insira seu email"
+        />
       </div>
       <div class="input-group">
         <input
-          type="password"
+          type="text"
           class="login-input"
-          v-model="password"
-          placeholder="Insira sua senha"
+          v-model="credentials.token"
+          placeholder="Insira o Token"
         />
+      </div>
+      <div class="input-group">
+        <input type="text" class="login-input" v-model="credentials.app" placeholder="Insira o App" />
       </div>
       <button type="button" class="btn-login" @click="redirect">Entrar</button>
     </div>
@@ -23,17 +31,24 @@
 export default {
   data() {
     return {
-      email: "",
-      password: ""
+      credentials: {}
     };
   },
   methods: {
-    redirect(){
-      if(localStorage.getItem("_settings")){
-        this.$router.push('/restaurant')
+    redirect() {
+      if (this.credentials.token.length < 30) {
+        alert("Por favor, insira o token corretamente!");
       }
-      else{
-        this.$router.push('/settings')
+      if(!this.credentials.email || !this.credentials.app){
+        alert("Por favor, preencha todos os campos");
+      } 
+      else {
+        localStorage.setItem("_credentials", JSON.stringify(this.credentials))
+        if (localStorage.getItem("_settings")) {
+          this.$router.push("/restaurant");
+        } else {
+          this.$router.push("/settings");
+        }
       }
     }
   }
@@ -46,7 +61,7 @@ export default {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  height: 100vh;
 }
 
 .login-box {
@@ -60,9 +75,9 @@ export default {
   box-shadow: 1px 1px 3px #aaa;
 }
 
-.img-login{
-    height: 100px;
-    margin-top: 20px;
+.img-login {
+  height: 100px;
+  margin-top: 20px;
 }
 
 .login-title {
@@ -88,7 +103,7 @@ export default {
   padding: 5px;
 }
 
-.btn-login{
+.btn-login {
   margin-bottom: 20px;
   height: 40px;
   width: 100px;
@@ -97,28 +112,28 @@ export default {
   border: #aaa;
 }
 
-.btn-login:hover{
-    width: 105px;
-    height: 45px;
-    background-color: #4ea1eb;
-    color: #fff;
-    font-size: 15px;
+.btn-login:hover {
+  width: 105px;
+  height: 45px;
+  background-color: #4ea1eb;
+  color: #fff;
+  font-size: 15px;
 }
 
-@media screen and (max-width: 1080px){
-    .login-box {
-        width: 60vw;
-        height: 60vh;
-    }
+@media screen and (max-width: 1080px) {
+  .login-box {
+    width: 60vw;
+    height: 60vh;
+  }
 }
-@media screen and (max-height: 600px){
-    .login{
-        height: 500px;
-    }
-    .login-box {
-        margin-top: 2vh;
-        width: 500px;
-        height: 400px;
-    }
+@media screen and (max-height: 600px) {
+  .login {
+    height: 500px;
+  }
+  .login-box {
+    margin-top: 2vh;
+    width: 500px;
+    height: 400px;
+  }
 }
 </style>
