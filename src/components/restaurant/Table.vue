@@ -220,6 +220,7 @@ export default {
     },
 
     closeTable() {
+
       const closedTable = {};
       const today = new Date();
       closedTable.bill = this.bill;
@@ -364,6 +365,17 @@ export default {
       
       closedTable.id = this.table.id
       this.$store.commit('addClosedTable', closedTable)
+
+      let index
+      for(index = 0; index < this.$store.state.tables.length; index++){
+        if(this.$store.state.tables[index].id == this.table.id){
+          alert("Mesa " + this.table.number + "Fechada!")
+          break;
+        }
+      }
+
+      this.$store.state.tables.splice(index, 1)
+
       localStorage.setItem("_tables", JSON.stringify(this.$store.state.tables))
       this.$router.push('/restaurant')
     }

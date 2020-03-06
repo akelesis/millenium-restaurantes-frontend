@@ -28,8 +28,6 @@ export default new Vuex.Store({
       }
     },
     addClosedTable(state, payload){
-      state.tables.splice(state.tables.findIndex(table => table == payload), 1)
-      alert(state.tables.findIndex(table => table == payload))
       payload.id = state.closedTables.length
       state.closedTables.push(payload)
     },
