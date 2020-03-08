@@ -41,7 +41,7 @@
             </div>
             <div class="settingsButton">
                 <button class="settingsRedirectButton" @click="redirect()">Continuar</button>
-                <button v-if="settings" class="settingsRedirectButton" @click="redirectBack()">Voltar</button>
+                <button v-if="isLocalStorageSet()" class="settingsRedirectButton" @click="redirectBack()">Voltar</button>
             </div>
         </div>
   </div>
@@ -51,7 +51,7 @@
 export default {
 data(){
     return{
-        settings: null
+        settings: {}
     }
 },
 methods: {
@@ -66,6 +66,14 @@ methods: {
     },
     redirectBack(){
         this.$router.push('/restaurant')
+    },
+    isLocalStorageSet(){
+        if(localStorage.getItem("_settings")){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }
 

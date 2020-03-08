@@ -334,10 +334,10 @@ export default {
             
             const objStore = db.createObjectStore('sync-invoices', {autoIncrement:true})
             objStore.transaction.oncomplete = function(event){
-              alert("Transaction Complete", event.target.result)
+              alert(event.target.result)
             }
             objStore.onerror = function(event){
-              alert('error: ', event.target.result)
+              alert(event.target.result)
             }
           }
 
@@ -368,7 +368,7 @@ export default {
       let index
       for(index = 0; index < this.$store.state.tables.length; index++){
         if(this.$store.state.tables[index].id == this.table.id){
-          alert("Mesa " + this.table.number + "Fechada!")
+          alert("Mesa " + this.table.number + " Fechada!")
           break;
         }
       }
