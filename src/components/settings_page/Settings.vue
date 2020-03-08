@@ -41,6 +41,7 @@
             </div>
             <div class="settingsButton">
                 <button class="settingsRedirectButton" @click="redirect()">Continuar</button>
+                <button v-if="settings" class="settingsRedirectButton" @click="redirectBack()">Voltar</button>
             </div>
         </div>
   </div>
@@ -50,7 +51,7 @@
 export default {
 data(){
     return{
-        settings: {}
+        settings: null
     }
 },
 methods: {
@@ -58,11 +59,13 @@ methods: {
         if(this.settings.company && this.settings.stock && this.settings.city && this.settings.zipCode && this.settings.neighborhood && this.settings.street && this.settings.number){
             localStorage.setItem("_settings", JSON.stringify(this.settings))
             this.$router.push('/restaurant')
-            alert("OK")
         }
         else{
             alert("Preencha todos os campos para continuar!")
         }
+    },
+    redirectBack(){
+        this.$router.push('/restaurant')
     }
 }
 
@@ -142,6 +145,7 @@ methods: {
     .settingsRedirectButton{
         width: 200px;
         height: 50px;
+        margin: 0 20px 0 20px;
         border: none;
         border-radius: 10px;
         box-shadow: 3px 3px 5px #777;

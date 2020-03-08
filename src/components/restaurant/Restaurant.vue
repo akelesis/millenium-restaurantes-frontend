@@ -18,7 +18,7 @@
         <i class="fas fa-users-cog"></i>
         <p>Configurações</p>
       </div>
-      <div class="toolcard" @click="$router.push({path: '/'})">
+      <div class="toolcard" @click="Exit()">
         <i class="fas fa-door-open"></i>
         <p>Sair</p>
       </div>
@@ -79,6 +79,12 @@ export default {
     goToReports() {
       this.$router.push('reports')
     },
+    createDailyReport(){
+      if(!localStorage.getItem("_report")){
+        const report = 0;
+        localStorage.setItem("_report", JSON.stringify(report))
+      }
+    },
     openTable() {
       /**/
       this.table.id = this.tables.length
@@ -97,6 +103,14 @@ export default {
     },
     addProd(prod) {
       this.table.order.push(prod);
+    },
+    Exit(){
+      const settings = localStorage.getItem("_settings")
+      localStorage.clear()
+
+      localStorage.setItem("_settings", settings)
+
+      this.$router.push({path: '/'})
     }
   },
   computed: {
@@ -111,7 +125,8 @@ export default {
     }
   },
   mounted(){
-      this.retrieveLocalStorage();
+      this.retrieveLocalStorage(),
+      this.createDailyReport()
   }
 };
 </script>

@@ -14,7 +14,7 @@ export default {
     .footer{
         background-color: #333;
         height: 10vh;
-        width: 100%;
+        width: 100vw;
         box-sizing: content-box;
         margin-top:200px;
     }

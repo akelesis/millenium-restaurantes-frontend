@@ -138,7 +138,6 @@ export default {
               alert("Error on creating Database: " + event.target.errorCode);
             };
             request.onupgradeneeded = event => {
-              alert("Database successful created! " + event);
               db = event.target.result;
 
               const objectStore = db.createObjectStore("stockProducts", {
@@ -375,6 +374,10 @@ export default {
       }
 
       this.$store.state.tables.splice(index, 1)
+
+      let dailyReport = parseFloat(localStorage.getItem("_report"))
+      dailyReport += ValorFinal
+      localStorage.setItem("_report", JSON.stringify(dailyReport))
 
       localStorage.setItem("_tables", JSON.stringify(this.$store.state.tables))
       this.$router.push('/restaurant')
