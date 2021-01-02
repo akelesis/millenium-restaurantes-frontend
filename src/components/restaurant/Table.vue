@@ -1,19 +1,19 @@
 <template>
-  <div class="table-manager">
+  <div class="table-manager" v-if="loaded">
     <div class="left-panel">
       <div class="product-box">
         <table class="product-table" style="width: 100%">
           <thead>
-            <td width="10%">Id</td>
+            <td width="10%">Cod</td>
             <td width="50%">Produto</td>
             <td width="20%">Preço</td>
             <td width="20%">Selecionar</td>
           </thead>
           <tbody>
             <tr v-for="prod in products" :key="prod.id">
-              <td>{{prod.id}}</td>
-              <td>{{prod.name}}</td>
-              <td>R$ {{prod.price.toFixed(2)}}</td>
+              <td>{{prod.Codigo}}</td>
+              <td>{{prod.Nome}}</td>
+              <td>R$ {{prod.PrecoVenda.toFixed(2)}}</td>
               <td>
                 <button type="button" @click="addProd(prod)" class="product-list-button">
                   <i class="fas fa-cart-plus"></i>
@@ -24,7 +24,7 @@
         </table>
       </div>
       <b-input-group size="md" prepend="Produto">
-        <b-form-input v-model="product.name"></b-form-input>
+        <b-form-input v-model="product.Nome"></b-form-input>
       </b-input-group>
       <b-input-group size="md" prepend="quantidade">
         <b-form-input type="number" v-model="quantity" min="0" max="999"></b-form-input>
@@ -48,10 +48,10 @@
           </thead>
           <tbody>
             <tr v-for="prod in table.products" :key="prod.id">
-              <td>{{prod.id}}</td>
-              <td>{{prod.name}}</td>
-              <td>R$ {{parseFloat(prod.price).toFixed(2)}}</td>
-              <td>{{(prod.quantity)}}</td>
+              <td>{{prod.Codigo}}</td>
+              <td>{{prod.Nome}}</td>
+              <td>R$ {{parseFloat(prod.PrecoVenda).toFixed(2)}}</td>
+              <td>{{(prod.Quantidade)}}</td>
               <td>
                 <button type="button" @click="removeProd(prod)" class="table-list-button">
                   <i class="fas fa-times"></i>
@@ -92,6 +92,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      loaded: false,
       OnTableChange: false,
       product: {},
       quantity: "",
@@ -119,19 +120,25 @@ export default {
     };
   },
   methods: {
-    loadProducts() {
+    async loadProducts() {
       if (navigator.onLine) {
         const headers = {};
         const credentials = JSON.parse(localStorage.getItem("_credentials"));
 
-        headers.AuthorizationToken = credentials.token;
+        headers["Authorization-Token"] = credentials.token;
         headers.User = credentials.email;
         headers.App = credentials.app;
 
         let db;
 
-        axios.post("http://localhost:8080/api/products", headers).then(res => {
-          this.$store.state.products = res.data;
+        try{
+          const productsFromAPI = await axios.get("http://localhost:3000/products", {headers: headers}).then(res => res.data);
+          this.$store.state.products = productsFromAPI
+
+          if(productsFromAPI){
+            this.loaded = true
+          }
+
           if (window.indexedDB) {
             const request = window.indexedDB.open("products");
             request.onerror = event => {
@@ -151,13 +158,17 @@ export default {
                   .transaction("stockProducts", "readwrite")
                   .objectStore("stockProducts");
 
-                res.data.forEach(product => {
+                productsFromAPI.forEach(product => {
                   productObjStore.add(product);
                 });
               };
             };
           }
-        });
+        }
+        catch(err) {
+          console.log(err)
+        }
+
       } else {
         const request = window.indexedDB.open("products");
         request.onerror = event => {
@@ -173,12 +184,13 @@ export default {
           objectStore.getAll().onsuccess = event => {
             this.$store.state.products = event.target.result;
           };
-        };
+        }
       }
+      console.log(this.$store.state.products)
     },
 
     insertOrder() {
-      this.product.quantity = this.quantity;
+      this.product.Quantidade = this.quantity;
       let order = this.product;
       this.$store.commit("insertOrder", order);
       this.OnTableChange = true;
@@ -204,8 +216,10 @@ export default {
       this.bill = 0;
       for (let i = 0; i < this.table.products.length; i++) {
         this.bill +=
-          parseFloat(this.table.products[i].price) *
-          parseFloat(this.table.products[i].quantity);
+          parseFloat(this.table.products[i].PrecoVenda) *
+          parseFloat(this.table.products[i].Quantidade);
+        this.table.products[i].ValorUnitario = this.table.products[i].PrecoVenda
+        this.table.products[i].ValorTotal = this.table.products[i].PrecoVenda * this.table.products[i].Quantidade
       }
       this.tip = this.bill * 0.1;
       this.total =
@@ -251,32 +265,32 @@ export default {
         aux.ValorUnitario = this.$store.state.table.products[i].price;
         aux.DescontoUnitario = "";
         aux.ValorTotal =
-          this.$store.state.table.products[i].price *
-          this.$store.state.table.products[i].quantity;
+          this.$store.state.table.products[i].PrecoVenda *
+          this.$store.state.table.products[i].Quantidade;
         ValorFinal += aux.ValorTotal;
         tableProds.push(aux);
       }
       let credentials = JSON.parse(localStorage.getItem("_credentials"));
 
       const headers = {
-        AuthorizationToken: credentials.token,
+        "authorization-token": credentials.token,
         User: credentials.email,
         App: credentials.app
       };
       const emission = {
         OrigemVenda: "Venda Direta",
-        Deposito: this.settings.stock,
+        Deposito: "DEMONSTRAÇÃO TESTE",
         StatusSistema: "Pedido Faturado",
         Status: "",
         Categoria: "",
         Validade: "",
-        Empresa: this.settings.company,
+        Empresa: "GRUPO MILLENIUM",
         Cliente: "EMPORIO DA CARNE COMERCIO VAREJISTA EIRELI",
         Vendedor: "login@vendedor.com",
         LancarComissaoVendedor: true,
         PlanoDeConta: "ALIMENTACAO",
-        FormaPagamento: this.paymentMethod,
-        NumeroParcelas: this.creditMethod,
+        FormaPagamento: this.paymentMethod.toString(),
+        NumeroParcelas: this.creditMethod.toString(),
         Transportadora: "",
         DataEnvio: closedTable.date,
         Enviado: false,
@@ -299,7 +313,7 @@ export default {
         Logradouro: this.settings.street,
         LogradouroNumero: this.settings.number,
         LogradouroComplemento: "",
-        Items: tableProds,
+        Items: this.$store.state.table.products,
         Pagamentos: [
           {
             DescricaoPagamento: "Pagamento",
@@ -310,17 +324,16 @@ export default {
             CredenciadoraCartao: "",
             CredenciadoraCNPJ: "",
             CV_NSU: "",
-            CondicaoPagamento: this.paymentMethod,
-            Parcelas: this.creditMethod,
+            CondicaoPagamento: this.paymentMethod.toString(),
+            Parcelas: this.creditMethod.toString(),
             PeriodoParcelas: 0,
             Adiantamento: 0.0,
             Quitar: "true"
           }
         ]
       };
-
-      const pack = {headers, emission };
       if ("serviceWorker" in navigator && "SyncManager" in window) {
+        console.log("Chegou aqui")
         navigator.serviceWorker.ready.then(sw => {
           const request = window.indexedDB.open("invoices", 1)
           let db
@@ -346,16 +359,20 @@ export default {
 
             const transaction = db.transaction("sync-invoices", "readwrite")
             const objectStore = transaction.objectStore('sync-invoices')
-            objectStore.add(pack)
+            objectStore.add(emission)
           }
           
           sw.sync.register('sync-new-invoice')
         })
 
+        axios.post("http://localhost:3000/bill", emission, {headers: headers})
+        .then(res => {
+          return res.data;
+        });
         
       }
       else{
-        axios.post("http://localhost:8080/api/bills", pack)
+        axios.post("http://localhost:3000/bill", emission, {headers: headers})
         .then(res => {
           return res.data;
         });
