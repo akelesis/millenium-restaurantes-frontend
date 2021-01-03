@@ -10,12 +10,16 @@
             <td width="20%">Selecionar</td>
           </thead>
           <tbody>
-            <tr v-for="prod in products" :key="prod.id">
-              <td>{{prod.Codigo}}</td>
-              <td>{{prod.Nome}}</td>
-              <td>R$ {{prod.PrecoVenda.toFixed(2)}}</td>
+            <tr v-for="prod in products" :key="prod.Codigo">
+              <td>{{ prod.Codigo }}</td>
+              <td>{{ prod.Nome }}</td>
+              <td>R$ {{ prod.PrecoVenda.toFixed(2) }}</td>
               <td>
-                <button type="button" @click="addProd(prod)" class="product-list-button">
+                <button
+                  type="button"
+                  @click="addProd(prod)"
+                  class="product-list-button"
+                >
                   <i class="fas fa-cart-plus"></i>
                 </button>
               </td>
@@ -27,9 +31,16 @@
         <b-form-input v-model="product.Nome"></b-form-input>
       </b-input-group>
       <b-input-group size="md" prepend="quantidade">
-        <b-form-input type="number" v-model="quantity" min="0" max="999"></b-form-input>
+        <b-form-input
+          type="number"
+          v-model="quantity"
+          min="0"
+          max="999"
+        ></b-form-input>
       </b-input-group>
-      <b-button class="mt-3" variant="primary" block @click="insertOrder()">Inserir pedido</b-button>
+      <b-button class="mt-3" variant="primary" block @click="insertOrder()"
+        >Inserir pedido</b-button
+      >
       <div class="return-arrow">
         <router-link to="/restaurant">
           <i class="fas fa-arrow-left"></i> Retornar
@@ -48,12 +59,16 @@
           </thead>
           <tbody>
             <tr v-for="prod in table.products" :key="prod.id">
-              <td>{{prod.Codigo}}</td>
-              <td>{{prod.Nome}}</td>
-              <td>R$ {{parseFloat(prod.PrecoVenda).toFixed(2)}}</td>
-              <td>{{(prod.Quantidade)}}</td>
+              <td>{{ prod.Codigo }}</td>
+              <td>{{ prod.Nome }}</td>
+              <td>R$ {{ parseFloat(prod.PrecoVenda).toFixed(2) }}</td>
+              <td>{{ prod.Quantidade }}</td>
               <td>
-                <button type="button" @click="removeProd(prod)" class="table-list-button">
+                <button
+                  type="button"
+                  @click="removeProd(prod)"
+                  class="table-list-button"
+                >
                   <i class="fas fa-times"></i>
                 </button>
               </td>
@@ -62,33 +77,52 @@
         </table>
       </div>
       <div class="bill">
-        Subtotal: R$ {{bill.toFixed(2).replace('.', ',')}}
+        Subtotal: R$ {{ bill.toFixed(2).replace(".", ",") }}
         <b-input-group size="md" prepend="couvert">
-          <b-form-input type="number" v-model="couvert" min="0" max="999" @change="getBill"></b-form-input>
+          <b-form-input
+            type="number"
+            v-model="couvert"
+            min="0"
+            max="999"
+            @change="getBill"
+          ></b-form-input>
         </b-input-group>
-        <p>Dez porcento: R${{tip}}</p>
-        <p>Total: R${{total}}</p>
+        <p>Dez porcento: R${{ tip }}</p>
+        <p>Total: R${{ total }}</p>
       </div>
       <b-button
         class="mt-3"
         variant="danger"
         block
         @click="$bvModal.show('close-table')"
-      >Fechar Mesa</b-button>
+        >Fechar Mesa</b-button
+      >
     </div>
     <b-modal id="close-table" hide-footer>
-      <template slot="modal-title">Fechar Mesa - {{table.name}}</template>
+      <template slot="modal-title">Fechar Mesa - {{ table.name }}</template>
       <div class="d-block text-center">
-        <b-form-select v-model="paymentMethod" :options="paymentOpt" class="mb-3"></b-form-select>
-        <b-form-select v-model="creditMethod" :options="creditOpt" class="mt-3 mb-4"></b-form-select>
+        <b-form-select
+          v-model="paymentMethod"
+          :options="paymentOpt"
+          class="mb-3"
+        ></b-form-select>
+        <b-form-select
+          v-model="creditMethod"
+          :options="creditOpt"
+          class="mt-3 mb-4"
+        ></b-form-select>
       </div>
-      <b-button class="mt-3" variant="primary" block @click="closeTable()">Fechar Mesa</b-button>
+      <b-button class="mt-3" variant="primary" block @click="closeTable()"
+        >Fechar Mesa</b-button
+      >
     </b-modal>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 export default {
   data() {
     return {
@@ -101,7 +135,7 @@ export default {
       paymentOpt: [
         { value: null, text: "Escolha uma forma de pagamento" },
         { value: 0, text: "À vista ou no débito" },
-        { value: 1, text: "Cartão de crédito" }
+        { value: 1, text: "Cartão de crédito" },
       ],
       creditOpt: [
         { value: 0, text: "Escolha o numero de parcelas em caso de crédito" },
@@ -110,13 +144,13 @@ export default {
         { value: 3, text: "3x" },
         { value: 4, text: "4x" },
         { value: 5, text: "5x" },
-        { value: 6, text: "6x" }
+        { value: 6, text: "6x" },
       ],
       bill: 0.0,
       couvert: 0.0,
       total: 0.0,
       tip: 0.0,
-      settings: {}
+      settings: {},
     };
   },
   methods: {
@@ -131,24 +165,26 @@ export default {
 
         let db;
 
-        try{
-          const productsFromAPI = await axios.get("http://localhost:3000/products", {headers: headers}).then(res => res.data);
-          this.$store.state.products = productsFromAPI
+        try {
+          const productsFromAPI = await axios
+            .get("http://localhost:3000/products", { headers: headers })
+            .then((res) => res.data);
+          this.$store.state.products = productsFromAPI;
 
-          if(productsFromAPI){
-            this.loaded = true
+          if (productsFromAPI) {
+            this.loaded = true;
           }
 
           if (window.indexedDB) {
             const request = window.indexedDB.open("products");
-            request.onerror = event => {
+            request.onerror = (event) => {
               alert("Error on creating Database: " + event.target.errorCode);
             };
-            request.onupgradeneeded = event => {
+            request.onupgradeneeded = (event) => {
               db = event.target.result;
 
               const objectStore = db.createObjectStore("stockProducts", {
-                keyPath: "id"
+                keyPath: "id",
               });
 
               objectStore.createIndex("name", "name", { unique: false });
@@ -158,41 +194,38 @@ export default {
                   .transaction("stockProducts", "readwrite")
                   .objectStore("stockProducts");
 
-                productsFromAPI.forEach(product => {
+                productsFromAPI.forEach((product) => {
                   productObjStore.add(product);
                 });
               };
             };
           }
+        } catch (err) {
+          console.log(err);
         }
-        catch(err) {
-          console.log(err)
-        }
-
       } else {
         const request = window.indexedDB.open("products");
-        request.onerror = event => {
+        request.onerror = (event) => {
           alert("Error on creating Database: " + event.target.errorCode);
         };
-        request.onsuccess = event => {
+        request.onsuccess = (event) => {
           const db = event.target.result;
 
           const objectStore = db
             .transaction("stockProducts")
             .objectStore("stockProducts");
 
-          objectStore.getAll().onsuccess = event => {
+          objectStore.getAll().onsuccess = (event) => {
             this.$store.state.products = event.target.result;
           };
-        }
+        };
       }
-      console.log(this.$store.state.products)
+      console.log(this.$store.state.products);
     },
 
     insertOrder() {
       this.product.Quantidade = this.quantity;
-      let order = this.product;
-      this.$store.commit("insertOrder", order);
+      this.$store.commit("insertOrder", this.product);
       this.OnTableChange = true;
       localStorage.setItem("_tables", JSON.stringify(this.$store.state.tables));
     },
@@ -218,8 +251,11 @@ export default {
         this.bill +=
           parseFloat(this.table.products[i].PrecoVenda) *
           parseFloat(this.table.products[i].Quantidade);
-        this.table.products[i].ValorUnitario = this.table.products[i].PrecoVenda
-        this.table.products[i].ValorTotal = this.table.products[i].PrecoVenda * this.table.products[i].Quantidade
+        this.table.products[i].ValorUnitario = this.table.products[
+          i
+        ].PrecoVenda;
+        this.table.products[i].ValorTotal =
+          this.table.products[i].PrecoVenda * this.table.products[i].Quantidade;
       }
       this.tip = this.bill * 0.1;
       this.total =
@@ -232,8 +268,7 @@ export default {
       this.OnTableChange = false;
     },
 
-    closeTable() {
-
+    async closeTable() {
       const closedTable = {};
       const today = new Date();
       closedTable.bill = this.bill;
@@ -275,7 +310,7 @@ export default {
       const headers = {
         "authorization-token": credentials.token,
         User: credentials.email,
-        App: credentials.app
+        App: credentials.app,
       };
       const emission = {
         OrigemVenda: "Venda Direta",
@@ -328,77 +363,132 @@ export default {
             Parcelas: this.creditMethod.toString(),
             PeriodoParcelas: 0,
             Adiantamento: 0.0,
-            Quitar: "true"
-          }
-        ]
+            Quitar: "true",
+          },
+        ],
       };
       if ("serviceWorker" in navigator && "SyncManager" in window) {
-        console.log("Chegou aqui")
-        navigator.serviceWorker.ready.then(sw => {
-          const request = window.indexedDB.open("invoices", 1)
-          let db
+        console.log("Chegou aqui");
+        navigator.serviceWorker.ready.then((sw) => {
+          const request = window.indexedDB.open("invoices", 1);
+          let db;
 
-          request.onerror = function(event){
-            alert("teste ",event.target.result)
-          }
-          
-          request.onupgradeneeded = function(event){
-            db = event.target.result
-            
-            const objStore = db.createObjectStore('sync-invoices', {autoIncrement:true})
-            objStore.transaction.oncomplete = function(event){
-              alert(event.target.result)
-            }
-            objStore.onerror = function(event){
-              alert(event.target.result)
-            }
-          }
+          request.onerror = function (event) {
+            alert("teste ", event.target.result);
+          };
 
-          request.onsuccess = function(event){
-            db = event.target.result
+          request.onupgradeneeded = function (event) {
+            db = event.target.result;
 
-            const transaction = db.transaction("sync-invoices", "readwrite")
-            const objectStore = transaction.objectStore('sync-invoices')
-            objectStore.add(emission)
-          }
-          
-          sw.sync.register('sync-new-invoice')
-        })
+            const objStore = db.createObjectStore("sync-invoices", {
+              autoIncrement: true,
+            });
+            objStore.transaction.oncomplete = function (event) {
+              alert(event.target.result);
+            };
+            objStore.onerror = function (event) {
+              alert(event.target.result);
+            };
+          };
 
-        axios.post("http://localhost:3000/bill", emission, {headers: headers})
-        .then(res => {
-          return res.data;
+          request.onsuccess = function (event) {
+            db = event.target.result;
+
+            const transaction = db.transaction("sync-invoices", "readwrite");
+            const objectStore = transaction.objectStore("sync-invoices");
+            objectStore.add(emission);
+          };
+
+          sw.sync.register("sync-new-invoice");
         });
-        
-      }
-      else{
-        axios.post("http://localhost:3000/bill", emission, {headers: headers})
-        .then(res => {
-          return res.data;
-        });
+
+        try {
+          const result = await axios
+            .post("http://localhost:3000/bill", emission, { headers: headers })
+            .then((res) => {
+              return res.data;
+            });
+
+          if (result) {
+            this.generatePDF(ValorFinal);
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        axios
+          .post("http://localhost:3000/bill", emission, { headers: headers })
+          .then((res) => {
+            return res.data;
+          });
       }
 
-      
-      closedTable.id = this.table.id
-      this.$store.commit('addClosedTable', closedTable)
+      closedTable.id = this.table.id;
+      this.$store.commit("addClosedTable", closedTable);
 
-      let index
-      for(index = 0; index < this.$store.state.tables.length; index++){
-        if(this.$store.state.tables[index].id == this.table.id){
-          alert("Mesa " + this.table.number + " Fechada!")
+      let index;
+      for (index = 0; index < this.$store.state.tables.length; index++) {
+        if (this.$store.state.tables[index].id == this.table.id) {
+          alert("Mesa " + this.table.number + " Fechada!");
           break;
         }
       }
 
-      this.$store.state.tables.splice(index, 1)
+      this.$store.state.tables.splice(index, 1);
 
-      let dailyReport = parseFloat(localStorage.getItem("_report"))
-      dailyReport += ValorFinal
-      localStorage.setItem("_report", JSON.stringify(dailyReport))
+      let dailyReport = parseFloat(localStorage.getItem("_report"));
+      dailyReport += ValorFinal;
+      localStorage.setItem("_report", JSON.stringify(dailyReport));
 
-      localStorage.setItem("_tables", JSON.stringify(this.$store.state.tables))
-      this.$router.push('/restaurant')
-    }
+      localStorage.setItem("_tables", JSON.stringify(this.$store.state.tables));
+
+      this.$router.push("/restaurant");
+    },
+    generatePDF(ValorFinal) {
+      const docAux = new jsPDF();
+
+      const height = docAux.getTextDimensions(
+        JSON.stringify(this.table.products),
+        {
+          maxWidth: 80,
+        }
+      ).h;
+      const width = docAux.getTextDimensions(
+        JSON.stringify(this.table.products),
+        {
+          maxWidth: 80,
+        }
+      ).w;
+
+      console.log(width + " x " + height);
+
+      const doc = new jsPDF({
+        orientation: "portrait",
+        format: [width, height-300],
+      });
+      
+      const body = [];
+      for (let i = 0; i < this.table.products.length; i++) {
+        const row = [
+          this.table.products[i].Nome.toLowerCase(),
+          this.table.products[i].Quantidade,
+          "R$" + this.table.products[i].ValorTotal.toFixed(2).replace(".", ","),
+        ];
+        body.push(row);
+      }
+      body.push(["Total", "R$" + ValorFinal.toFixed(2).replace(".", ",")])
+
+      doc.text("Documento não fiscal", 15, 10)
+      doc.setFontSize(8);
+      doc.autoTable({
+        head: [["item", "Qtd.", "Valor"]],
+        body: body,
+        theme: "plain"
+      });
+
+      doc.autoPrint();
+      doc.output("dataurlnewwindow");
+    },
   },
   computed: {
     products() {
@@ -409,16 +499,16 @@ export default {
     },
     closedTables() {
       return this.$store.state.closedTables;
-    }
+    },
   },
   watch: {
-    OnTableChange: function() {
+    OnTableChange: function () {
       this.getBill();
-    }
+    },
   },
   mounted() {
     this.loadProducts(), this.getBill();
-  }
+  },
 };
 </script>
 

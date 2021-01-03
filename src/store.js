@@ -40,7 +40,7 @@ export default new Vuex.Store({
     },
     insertOrder(state, payload){
       for(let i = 0; i < state.table.products.length; i++){
-        if(state.table.products[i].id == payload.id){
+        if(state.table.products[i].ID == payload.ID){
           state.table.products[i].quantity = parseInt(state.table.products[i].quantity) + parseInt(payload.quantity)
           return
         }
