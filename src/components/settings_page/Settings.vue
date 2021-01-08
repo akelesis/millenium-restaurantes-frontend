@@ -13,6 +13,10 @@
                 <input name="stock" id="stock" class="settingsInputControl" v-model="settings.stock" type="text">
             </div>
             <div class="settingsInputGroup">
+                <label for="cnpj">CNPJ</label>
+                <input name="cnpj" id="cnpj" class="settingsInputControl" v-model="settings.cnpj" type="text">
+            </div>
+            <div class="settingsInputGroup">
                 <label for="city">Município</label>
                 <input name="city" id="city" class="settingsInputControl" v-model="settings.city" type="text">
             </div>
@@ -56,7 +60,7 @@ data(){
 },
 methods: {
     redirect(){
-        if(this.settings.company && this.settings.stock && this.settings.city && this.settings.zipCode && this.settings.neighborhood && this.settings.street && this.settings.number){
+        if(this.settings.company && this.settings.stock && this.settings.city && this.settings.zipCode && this.settings.neighborhood && this.settings.street && this.settings.number && this.settings.cnpj){
             localStorage.setItem("_settings", JSON.stringify(this.settings))
             this.$router.push('/restaurant')
         }
@@ -91,7 +95,7 @@ methods: {
 
     .settingsTitle{
         width: 100vw;
-        height: 200px;
+        height: 100px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -100,6 +104,7 @@ methods: {
     }
 
     .settingsInputs{
+        margin-top: 0;
         width: 60vw;
         height: auto;
         padding: 50px;

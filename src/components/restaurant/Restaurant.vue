@@ -111,6 +111,9 @@ export default {
       localStorage.setItem("_settings", settings)
 
       this.$router.push({path: '/'})
+    },
+    clearCurrentTable() {
+      localStorage.removeItem("_currentTable")
     }
   },
   computed: {
@@ -126,7 +129,10 @@ export default {
   },
   mounted(){
       this.retrieveLocalStorage(),
-      this.createDailyReport()
+      this.createDailyReport(),
+      setTimeout(() => {
+        this.clearCurrentTable()
+      }, 500)
   }
 };
 </script>

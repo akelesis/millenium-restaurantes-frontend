@@ -5,6 +5,7 @@ import Settings from '../components/settings_page/Settings.vue'
 import Restaurant from '../components/restaurant/Restaurant.vue'
 import Table from '../components/restaurant/Table.vue'
 import Reports from '../components/restaurant/Reports.vue'
+import Receipt from '../components/restaurant/Receipt.vue'
 
 Vue.use(Router)
 
@@ -36,6 +37,11 @@ export default new Router({
       path: '/reports',
       name: 'reports',
       component: Reports
-    }
+    },
+    {
+      path: '/receipt',
+      name: 'receipt',
+      component: Receipt
+    },
   ]
 })

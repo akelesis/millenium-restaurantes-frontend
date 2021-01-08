@@ -23,5 +23,11 @@ export default {
     .footer{
         height: 100px;
     }
+
+    @media print {
+        .footer {
+            display: none !important;
+        }
+    }
 }
 </style>

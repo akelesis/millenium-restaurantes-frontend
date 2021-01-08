@@ -121,8 +121,6 @@
 
 <script>
 import axios from "axios";
-import { jsPDF } from "jspdf";
-import "jspdf-autotable";
 export default {
   data() {
     return {
@@ -269,6 +267,7 @@ export default {
     },
 
     async closeTable() {
+      localStorage.setItem("_currentTable", JSON.stringify(this.table))
       const closedTable = {};
       const today = new Date();
       closedTable.bill = this.bill;
@@ -410,7 +409,7 @@ export default {
             });
 
           if (result) {
-            this.generatePDF(ValorFinal);
+            window.open('http://localhost:8080/receipt', "_blank")
           }
         } catch (err) {
           console.log(err);
@@ -429,7 +428,6 @@ export default {
       let index;
       for (index = 0; index < this.$store.state.tables.length; index++) {
         if (this.$store.state.tables[index].id == this.table.id) {
-          alert("Mesa " + this.table.number + " Fechada!");
           break;
         }
       }
@@ -441,54 +439,9 @@ export default {
       localStorage.setItem("_report", JSON.stringify(dailyReport));
 
       localStorage.setItem("_tables", JSON.stringify(this.$store.state.tables));
-
       this.$router.push("/restaurant");
     },
-    generatePDF(ValorFinal) {
-      const docAux = new jsPDF();
-
-      const height = docAux.getTextDimensions(
-        JSON.stringify(this.table.products),
-        {
-          maxWidth: 80,
-        }
-      ).h;
-      const width = docAux.getTextDimensions(
-        JSON.stringify(this.table.products),
-        {
-          maxWidth: 80,
-        }
-      ).w;
-
-      console.log(width + " x " + height);
-
-      const doc = new jsPDF({
-        orientation: "portrait",
-        format: [width, height-300],
-      });
-      
-      const body = [];
-      for (let i = 0; i < this.table.products.length; i++) {
-        const row = [
-          this.table.products[i].Nome.toLowerCase(),
-          this.table.products[i].Quantidade,
-          "R$" + this.table.products[i].ValorTotal.toFixed(2).replace(".", ","),
-        ];
-        body.push(row);
-      }
-      body.push(["Total", "R$" + ValorFinal.toFixed(2).replace(".", ",")])
-
-      doc.text("Documento não fiscal", 15, 10)
-      doc.setFontSize(8);
-      doc.autoTable({
-        head: [["item", "Qtd.", "Valor"]],
-        body: body,
-        theme: "plain"
-      });
-
-      doc.autoPrint();
-      doc.output("dataurlnewwindow");
-    },
+    
   },
   computed: {
     products() {

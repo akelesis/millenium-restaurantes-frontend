@@ -12,7 +12,7 @@ export default {
 
 <style>
 .content{
-    height: 80vh;
+    min-height: 65vh;
     width: 99vw;
 }
 </style>

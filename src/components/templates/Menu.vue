@@ -43,4 +43,10 @@ export default {
             height: 70px;
         }
     }
+
+    @media print {
+        .menu {
+            display: none !important;
+        }
+    }
 </style>
